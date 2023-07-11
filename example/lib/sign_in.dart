@@ -22,19 +22,6 @@ class SignUp extends StatelessWidget {
             onSignUpComplete: (response) {
               Navigator.of(context).pushReplacementNamed('/home');
             },
-            metadataFields: [
-              MetaDataField(
-                prefixIcon: const Icon(Icons.person),
-                label: 'Username',
-                key: 'username',
-                validator: (val) {
-                  if (val == null || val.isEmpty) {
-                    return 'Please enter something';
-                  }
-                  return null;
-                },
-              ),
-            ],
           ),
           const Divider(),
           optionText,
@@ -52,7 +39,10 @@ class SignUp extends StatelessWidget {
               Navigator.popAndPushNamed(context, '/phone_sign_in');
             },
             icon: const Icon(Icons.phone),
-            label: const Text('Sign in with Phone'),
+            label: const Text('\t\t\tSign in with Phone'),
+            style: ElevatedButton.styleFrom(
+              minimumSize: Size(10.0, 54.0)
+            ),
           ),
           spacer,
           SupaSocialsAuth(

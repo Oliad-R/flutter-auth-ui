@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/src/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:wc_form_validators/wc_form_validators.dart';
 
 /// Information about the metadata to pass to the signup form
 ///
@@ -17,6 +18,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// { 'username': 'Whatever your user entered' }
 /// ```
 class MetaDataField {
+  /// Put Fields in a row
+  // final bool inRow;
+
   /// Label of the `TextFormField` for this metadata
   final String label;
 
@@ -34,6 +38,7 @@ class MetaDataField {
     required this.key,
     this.validator,
     this.prefixIcon,
+    // required this.inRow,
   });
 }
 
@@ -93,6 +98,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPassController = TextEditingController();
   late final Map<MetaDataField, TextEditingController> _metadataControllers;
 
   bool _isLoading = false;
@@ -133,32 +139,77 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
               if (value == null ||
                   value.isEmpty ||
                   !EmailValidator.validate(_emailController.text)) {
-                return 'Please enter a valid email address';
+                return 'Invalid email address';
               }
-              return null;
+              else {
+                return null;
+              }
             },
             decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.email),
-              label: Text('Enter your email'),
+              // prefixIcon: Icon(Icons.email),
+              label: Text('Email'),
             ),
             controller: _emailController,
           ),
           if (!_forgotPassword) ...[
             spacer(16),
+            if (!_isSigningIn) ...[
             TextFormField(
-              validator: (value) {
-                if (value == null || value.isEmpty || value.length < 6) {
-                  return 'Please enter a password that is at least 6 characters long';
-                }
-                return null;
-              },
+              validator:Validators.compose([
+                  Validators.required('Password is required'),
+                  Validators.patternString(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$', 'Password must have:\n\t•\t1 Uppercase\n\t•\t1 Lowercase\n\t•\t1 Number\n\t•\t8 Characters Long')]),
+              //  (value) {
+                
+              //   ]);
+                // if (value == null || value.isEmpty || value.length < 6) {
+                //   return 'Password must be at least 6 characters long';
+                // }
+                // return null;
+              // },
               decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.lock),
-                label: Text('Enter your password'),
+                // prefixIcon: Icon(Icons.key_rounded),
+                label: Text('Password'),
               ),
               obscureText: true,
               controller: _passwordController,
             ),
+            spacer(16),
+            TextFormField(
+              validator: (value) {
+                if (value!=_passwordController.text){
+                  return "Passwords do not match.";
+                }  
+                else {
+                  return null;
+                }            
+              },
+              decoration: const InputDecoration(
+                // prefixIcon: Icon(Icons.key_rounded),
+                label: Text('Confirm Password'),
+              ),
+              obscureText: true,
+              controller: _confirmPassController,
+            ),
+            ],
+            if(_isSigningIn) ... [
+              TextFormField(
+              validator: 
+              (value) {
+                if (value==null || value.isEmpty){
+                  return "Password required.";
+                }
+                else {
+                  return null;
+                }
+              },
+              decoration: const InputDecoration(
+                // prefixIcon: Icon(Icons.key_rounded),
+                label: Text('Password'),
+              ),
+              obscureText: true,
+              controller: _passwordController,
+            )
+            ],
             spacer(16),
             if (widget.metadataFields != null && !_isSigningIn)
               ...widget.metadataFields!

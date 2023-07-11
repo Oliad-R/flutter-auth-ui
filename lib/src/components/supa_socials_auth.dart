@@ -52,6 +52,11 @@ enum SocialProviders {
     btnBgColor: Colors.deepPurple,
     provider: Provider.slack,
   ),
+  linkedin(
+    iconData: FontAwesomeIcons.linkedin,
+    btnBgColor: Colors.blue,
+    provider: Provider.linkedin,
+  ),
   spotify(
     iconData: FontAwesomeIcons.spotify,
     btnBgColor: Colors.green,

@@ -58,21 +58,21 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
             },
             decoration: const InputDecoration(
               prefixIcon: Icon(Icons.phone),
-              label: Text('Enter your phone number'),
+              label: Text('Phone Number'),
             ),
             controller: _phone,
           ),
           spacer(16),
           TextFormField(
             validator: (value) {
-              if (value == null || value.isEmpty || value.length < 6) {
-                return 'Please enter a password that is at least 6 characters long';
+              if (value == null || value.isEmpty) {
+                return 'Password required.';
               }
               return null;
             },
             decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.lock),
-              label: Text('Enter your password'),
+              // prefixIcon: Icon(Icons.lock),
+              label: Text('Password'),
             ),
             obscureText: true,
             controller: _password,

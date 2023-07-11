@@ -1,6 +1,6 @@
-import 'package:example/phone_sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
+import 'package:device_preview/device_preview.dart';
 
 import './home.dart';
 import './sign_in.dart';
@@ -8,6 +8,7 @@ import './magic_link.dart';
 import './update_password.dart';
 import 'phone_sign_in.dart';
 import './verify_phone.dart';
+import 'phone_sign_up.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +18,9 @@ void main() async {
     url: 'https://yoursupabaseurl.supabase.co',
     anonKey: 'your_anon_key',
   );
-  runApp(const MyApp());
+  runApp(DevicePreview(
+    builder: (context) => const MyApp()
+    ));
 }
 
 class MyApp extends StatelessWidget {
