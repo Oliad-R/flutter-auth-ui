@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:supabase_auth_ui/src/utils/constants.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
+import 'package:wc_form_validators/wc_form_validators.dart';
 
 /// UI component to create a phone + password signin/ signup form
 class SupaPhoneAuth extends StatefulWidget {
@@ -28,6 +30,15 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
   final _formKey = GlobalKey<FormState>();
   final _phone = TextEditingController();
   final _password = TextEditingController();
+  final _confirmPass = TextEditingController();
+
+  bool _forgotPassword = false;
+
+  var maskFormatter = new MaskTextInputFormatter(
+    mask: '+# (###) ###-####', 
+    filter: { "#": RegExp(r'[0-9]') },
+    type: MaskAutoCompletionType.lazy
+  );
 
   @override
   void initState() {
@@ -49,39 +60,75 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TextFormField(
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter a valid phone number';
-              }
-              return null;
-            },
-            decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.phone),
-              label: Text('Phone Number'),
+          if (!(_forgotPassword)) ...[
+            TextFormField(
+              inputFormatters: [maskFormatter],
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Phone number is required';
+                } else if (!RegExp(r'^\+1 \(\d{3}\) \d{3}-\d{4}$').hasMatch(value)) {
+                  return 'Invalid phone number';
+                }
+                return null;
+              },
+              decoration: const InputDecoration(
+                // prefixIcon: Icon(Icons.phone),
+                label: Text('Phone Number'),
+              ),
+              controller: _phone,
             ),
-            controller: _phone,
-          ),
-          spacer(16),
-          TextFormField(
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Password required.';
-              }
-              return null;
-            },
-            decoration: const InputDecoration(
-              // prefixIcon: Icon(Icons.lock),
-              label: Text('Password'),
-            ),
-            obscureText: true,
-            controller: _password,
-          ),
+            spacer(16),
+            if (!(isSigningIn)) ...[
+              TextFormField(
+                validator:Validators.compose([
+                    Validators.required('Password is required'),
+                    Validators.patternString(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$', 'Password must have:\n\t•\t1 Uppercase\n\t•\t1 Lowercase\n\t•\t1 Number\n\t•\t8 Characters Long')]),
+                decoration: const InputDecoration(
+                  // prefixIcon: Icon(Icons.key_rounded),
+                  label: Text('Password'),
+                ),
+                obscureText: true,
+                controller: _password,
+              ),
+              spacer(16),
+              TextFormField(
+                validator: (value) {
+                  if (value==null || value.isEmpty){
+                    return "Confirm password required";
+                  }
+                  else if (value!=_password.text){
+                    return "Passwords do not match";
+                  }  
+                  else {
+                    return null;
+                  }            
+                },
+                decoration: const InputDecoration(
+                  label: Text('Confirm Password'),
+                ),
+                obscureText: true,
+                controller: _confirmPass,
+              ),
+            ],
+            if (isSigningIn) ... [
+              TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Password required';
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(
+                  label: Text('Password'),
+                ),
+                obscureText: true,
+                controller: _password,
+              )
+            ],
           spacer(16),
           ElevatedButton(
             child: Text(
               isSigningIn ? 'Sign In' : 'Sign Up',
-              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             onPressed: () async {
               if (!_formKey.currentState!.validate()) {
@@ -121,6 +168,63 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
             },
           ),
           spacer(10),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _forgotPassword = true;
+                });
+              },
+              child: const Text('Forgot your password?'),
+            ),
+          ],
+          if (_forgotPassword) ...[
+            spacer(16),
+            TextFormField(
+              inputFormatters: [maskFormatter],
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Phone number is required';
+                } else if (!RegExp(r'^\+1 \(\d{3}\) \d{3}-\d{4}$').hasMatch(value)) {
+                  return 'Invalid phone number';
+                }
+                return null;
+              },
+              decoration: const InputDecoration(
+                // prefixIcon: Icon(Icons.phone),
+                label: Text('Phone Number'),
+              ),
+              controller: _phone,
+            ),
+            spacer(16),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  if (!_formKey.currentState!.validate()) {
+                    return;
+                  }
+                  final phoneNum = _phone.text.trim();
+                  // await supabase.auth.resetPasswordForEmail(email);
+                  // widget.onPasswordResetEmailSent?.call();
+                } on AuthException catch (error) {
+                  widget.onError?.call(error);
+                } catch (error) {
+                  widget.onError?.call(error);
+                }
+              },
+              child: const Text('Send password reset via SMS'),
+            ),
+            spacer(16),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  _forgotPassword = false;
+                });
+              },
+              child: Text(
+              isSigningIn ? 'Back to Sign In' : 'Back to Sign Up',
+            ),
+            ),
+          ],
         ],
       ),
     );

@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
           border: OutlineInputBorder(),
         ),
       ),
-      initialRoute: '/',
+      initialRoute: '/phone_sign_up',
       routes: {
         '/': (context) => const SignUp(),
         '/magic_link': (context) => const MagicLink(),

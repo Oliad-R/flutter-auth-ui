@@ -176,7 +176,10 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
             spacer(16),
             TextFormField(
               validator: (value) {
-                if (value!=_passwordController.text){
+                if (value==null || value.isEmpty){
+                  return "Confirm password required.";
+                }
+                else if (value!=_passwordController.text){
                   return "Passwords do not match.";
                 }  
                 else {

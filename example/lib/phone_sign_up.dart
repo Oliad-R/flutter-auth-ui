@@ -17,16 +17,16 @@ class PhoneSignUp extends StatelessWidget {
             SupaPhoneAuth(
               authAction: SupaAuthAction.signUp,
               onSuccess: (response) {
-                Navigator.of(context).pushReplacementNamed('/verify_phone');
+                // Navigator.of(context).pushReplacementNamed('/verify_phone');
               },
             ),
             TextButton(
               child: const Text(
                 'Already have an account? Sign In',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                // style: TextStyle(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
-                Navigator.of(context).pushNamed('/sign_in');
+                Navigator.of(context).pushNamed('/phone_sign_in');
               },
             ),
           ],
