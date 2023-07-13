@@ -20,15 +20,14 @@ class PhoneSignUp extends StatelessWidget {
                 // Navigator.of(context).pushReplacementNamed('/verify_phone');
               },
             ),
-            TextButton(
-              child: const Text(
-                'Already have an account? Sign In',
-                // style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/phone_sign_in');
-              },
-            ),
+            // TextButton(
+            //   child: const Text(
+            //     'Already have an account? Sign In',
+            //   ),
+            //   onPressed: () {
+            //     Navigator.of(context).pushNamed('/phone_sign_in');
+            //   },
+            // ),
           ],
         ),
       ),

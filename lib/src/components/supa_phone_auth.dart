@@ -109,6 +109,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                 obscureText: true,
                 controller: _confirmPass,
               ),
+
             ],
             if (isSigningIn) ... [
               TextFormField(
@@ -123,7 +124,8 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                 ),
                 obscureText: true,
                 controller: _password,
-              )
+              ),
+            
             ],
           spacer(16),
           ElevatedButton(
@@ -176,6 +178,29 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               },
               child: const Text('Forgot your password?'),
             ),
+          ],
+          if (!(_forgotPassword)) ... [
+            if (isSigningIn)... [
+              TextButton(
+                child: const Text(
+                  'Don\'t have an account? Sign Up',
+                  // style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/phone_sign_up');
+                },
+              ),
+            ],
+            if (!(isSigningIn)) ... [
+              TextButton(
+                  child: const Text(
+                    'Already have an account? Sign In',
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/phone_sign_in');
+                  },
+                ),
+            ],
           ],
           if (_forgotPassword) ...[
             spacer(16),

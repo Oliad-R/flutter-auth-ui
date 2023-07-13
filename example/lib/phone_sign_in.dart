@@ -20,15 +20,15 @@ class PhoneSignIn extends StatelessWidget {
                 Navigator.of(context).pushReplacementNamed('/home');
               },
             ),
-            TextButton(
-              child: const Text(
-                'Don\'t have an account? Sign Up',
-                // style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, '/phone_sign_up');
-              },
-            ),
+            // TextButton(
+            //   child: const Text(
+            //     'Don\'t have an account? Sign Up',
+            //     // style: TextStyle(fontWeight: FontWeight.bold),
+            //   ),
+            //   onPressed: () {
+            //     Navigator.pushNamed(context, '/phone_sign_up');
+            //   },
+            // ),
           ],
         ),
       ),
