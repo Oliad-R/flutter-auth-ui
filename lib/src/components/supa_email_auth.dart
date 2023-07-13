@@ -341,7 +341,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                   _forgotPassword = false;
                 });
               },
-              child: const Text('Back to sign in'),
+              child: const Text('Back to Sign in'),
             ),
           ],
           spacer(16),

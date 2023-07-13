@@ -177,19 +177,18 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
 
           spacer(16),
 
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _forgotPassword = true;
-              });
-            },
-            child: const Text('Forgot your password?'),
-          ),
-
           if (isSigningIn)... [
             TextButton(
+              onPressed: () {
+                setState(() {
+                  _forgotPassword = true;
+                });
+              },
+              child: const Text('Forgot your password?'),
+            ),
+            TextButton(
               child: const Text(
-                'Don\'t have an account? Sign Up',
+                'Don\'t have an account? Sign up',
                 // style: TextStyle(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
@@ -204,7 +203,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
           if (!(isSigningIn)) ... [
             TextButton(
                 child: const Text(
-                  'Already have an account? Sign In',
+                  'Already have an account? Sign in',
                 ),
                 onPressed: () {
                   setState(() {
@@ -264,9 +263,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                   _forgotPassword = false;
                 });
               },
-              child: Text(
-              isSigningIn ? 'Back to Sign In' : 'Back to Sign Up',
-            ),
+              child: const Text('Back to Sign in'),
             ),
           ],
         ],
