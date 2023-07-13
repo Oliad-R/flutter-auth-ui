@@ -33,6 +33,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
   final _confirmPass = TextEditingController();
 
   bool _forgotPassword = false;
+  var isSigningIn = true;
 
   var maskFormatter = new MaskTextInputFormatter(
     mask: '+# (###) ###-####', 
@@ -54,13 +55,12 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
 
   @override
   Widget build(BuildContext context) {
-    final isSigningIn = widget.authAction == SupaAuthAction.signIn;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (!(_forgotPassword)) ...[
+        if (!(_forgotPassword)) ...[
             TextFormField(
               inputFormatters: [maskFormatter],
               validator: (value) {
@@ -77,7 +77,9 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               ),
               controller: _phone,
             ),
+
             spacer(16),
+
             if (!(isSigningIn)) ...[
               TextFormField(
                 validator:Validators.compose([
@@ -90,7 +92,9 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                 obscureText: true,
                 controller: _password,
               ),
+
               spacer(16),
+
               TextFormField(
                 validator: (value) {
                   if (value==null || value.isEmpty){
@@ -109,8 +113,8 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                 obscureText: true,
                 controller: _confirmPass,
               ),
-
             ],
+
             if (isSigningIn) ... [
               TextFormField(
                 validator: (value) {
@@ -125,9 +129,10 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                 obscureText: true,
                 controller: _password,
               ),
-            
             ],
+          
           spacer(16),
+
           ElevatedButton(
             child: Text(
               isSigningIn ? 'Sign In' : 'Sign Up',
@@ -169,41 +174,51 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               });
             },
           ),
+
           spacer(10),
+
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _forgotPassword = true;
+              });
+            },
+            child: const Text('Forgot your password?'),
+          ),
+
+          if (isSigningIn)... [
             TextButton(
+              child: const Text(
+                'Don\'t have an account? Sign Up',
+                // style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               onPressed: () {
                 setState(() {
-                  _forgotPassword = true;
-                });
+                    isSigningIn = !isSigningIn;
+                    _forgotPassword = false;
+                  });
               },
-              child: const Text('Forgot your password?'),
             ),
           ],
-          if (!(_forgotPassword)) ... [
-            if (isSigningIn)... [
-              TextButton(
+
+          if (!(isSigningIn)) ... [
+            TextButton(
                 child: const Text(
-                  'Don\'t have an account? Sign Up',
-                  // style: TextStyle(fontWeight: FontWeight.bold),
+                  'Already have an account? Sign In',
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/phone_sign_up');
+                  setState(() {
+                    isSigningIn = !isSigningIn;
+                    _forgotPassword = false;
+                  });
                 },
               ),
             ],
-            if (!(isSigningIn)) ... [
-              TextButton(
-                  child: const Text(
-                    'Already have an account? Sign In',
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/phone_sign_in');
-                  },
-                ),
-            ],
           ],
+
+          spacer(16),
+
           if (_forgotPassword) ...[
-            spacer(16),
             TextFormField(
               inputFormatters: [maskFormatter],
               validator: (value) {
@@ -220,7 +235,9 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               ),
               controller: _phone,
             ),
+
             spacer(16),
+
             ElevatedButton(
               onPressed: () async {
                 try {
@@ -238,7 +255,9 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               },
               child: const Text('Send password reset via SMS'),
             ),
+
             spacer(16),
+
             TextButton(
               onPressed: () {
                 setState(() {
