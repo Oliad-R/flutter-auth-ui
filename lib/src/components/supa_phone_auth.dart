@@ -131,7 +131,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               ),
             ],
           
-          spacer(32),
+          spacer(16),
 
           ElevatedButton(
             child: Text(
@@ -175,7 +175,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
             },
           ),
 
-          spacer(10),
+          spacer(16),
 
           TextButton(
             onPressed: () {
