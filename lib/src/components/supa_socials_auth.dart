@@ -195,6 +195,19 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
           ),
         );
 
+        if (socialProvider == SocialProviders.google && coloredBg) {
+          iconWidget = Image.asset(
+            'assets/logos/google_light.png',
+            package: 'supabase_auth_ui',
+            width: 48,
+            height: 48,
+          );
+
+          foregroundColor = Colors.black;
+          backgroundColor = Colors.white;
+          overlayColor = Colors.white;
+        }
+
         onAuthButtonPressed() async {
           try {
             await supabase.auth.signInWithOAuth(
