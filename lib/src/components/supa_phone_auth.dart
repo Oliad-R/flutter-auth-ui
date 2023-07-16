@@ -63,6 +63,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
         children: [
         if (!(_forgotPassword)) ...[
             TextFormField(
+              keyboardType: TextInputType.phone,
               inputFormatters: [maskFormatter],
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -220,6 +221,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
 
           if (_forgotPassword) ...[
             TextFormField(
+              keyboardType: TextInputType.phone,
               inputFormatters: [maskFormatter],
               validator: (value) {
                 if (value == null || value.isEmpty) {

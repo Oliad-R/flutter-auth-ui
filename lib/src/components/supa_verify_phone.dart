@@ -53,6 +53,7 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextFormField(
+            keyboardType: TextInputType.phone,
             inputFormatters: [maskFormatter],
             validator: (value) {
               if (value == null || value.isEmpty) {
