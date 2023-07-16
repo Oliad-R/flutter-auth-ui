@@ -50,6 +50,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
   void dispose() {
     _phone.dispose();
     _password.dispose();
+    _confirmPass.dispose();
     super.dispose();
   }
 

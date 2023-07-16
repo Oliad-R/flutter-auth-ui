@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:supabase_auth_ui/src/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -25,6 +26,12 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
   final _formKey = GlobalKey<FormState>();
   final _code = TextEditingController();
 
+  var maskFormatter = new MaskTextInputFormatter(
+    mask: '######',
+    filter: { "#": RegExp(r'[0-9]') },
+    type: MaskAutoCompletionType.eager
+  );
+
   @override
   void initState() {
     super.initState();
@@ -46,15 +53,16 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextFormField(
+            inputFormatters: [maskFormatter],
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter the one time code sent';
               }
-              return null;
+              return null;  
             },
             decoration: const InputDecoration(
-              prefixIcon: Icon(Icons.code),
-              label: Text('Enter the code sent'),
+              // prefixIcon: Icon(Icons.pin),
+              label: Text('Verification Code'),
             ),
             controller: _code,
           ),
@@ -62,7 +70,7 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
           ElevatedButton(
             child: const Text(
               'Verify Phone',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              // style: TextStyle(fontWeight: FontWeight.bold),
             ),
             onPressed: () async {
               if (!_formKey.currentState!.validate()) {
@@ -97,6 +105,16 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
             },
           ),
           spacer(10),
+
+          TextButton(
+              child: const Text(
+                'Take me back to Sign up',
+                // style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onPressed: () {
+                Navigator.pushNamed(context, '/');
+              },
+            ),
         ],
       ),
     );

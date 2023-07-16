@@ -149,7 +149,12 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
       if (session != null && mounted) {
         widget.onSuccess.call(session);
         if (widget.showSuccessSnackBar) {
-          context.showSnackBar('Successfully signed in!');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Successfully signed in!'),
+              backgroundColor: Colors.green,
+            ),
+          );
         }
       }
     });
@@ -190,19 +195,6 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
           ),
         );
 
-        if (socialProvider == SocialProviders.google && coloredBg) {
-          iconWidget = Image.asset(
-            'assets/logos/google_light.png',
-            package: 'supabase_auth_ui',
-            width: 48,
-            height: 48,
-          );
-
-          foregroundColor = Colors.black;
-          backgroundColor = Colors.white;
-          overlayColor = Colors.white;
-        }
-
         onAuthButtonPressed() async {
           try {
             await supabase.auth.signInWithOAuth(
@@ -211,46 +203,52 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
             );
           } on AuthException catch (error) {
             if (widget.onError == null) {
-              context.showErrorSnackBar(error.message);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(error.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
             } else {
               widget.onError?.call(error);
             }
           } catch (error) {
             if (widget.onError == null) {
-              context
-                  .showErrorSnackBar('Unexpected error has occurred: $error');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Unexpected error has occurred: $error'),
+                  backgroundColor: Colors.red,
+                ),
+              );
             } else {
               widget.onError?.call(error);
             }
           }
         }
 
-        final authButtonStyle = ButtonStyle(
-          foregroundColor: MaterialStateProperty.all(foregroundColor),
-          backgroundColor: MaterialStateProperty.all(backgroundColor),
-          overlayColor: MaterialStateProperty.all(overlayColor),
-          iconColor: MaterialStateProperty.all(iconColor),
+        final authButtonStyle = ElevatedButton.styleFrom(
+          foregroundColor: foregroundColor, backgroundColor: backgroundColor,
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4),
+          ),
         );
 
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           child: widget.socialButtonVariant == SocialButtonVariant.icon
-              ? Material(
-                  shape: const CircleBorder(),
-                  elevation: 2,
-                  color: backgroundColor,
-                  child: InkResponse(
-                    radius: 24,
-                    onTap: onAuthButtonPressed,
-                    child: iconWidget,
-                  ),
+              ? InkResponse(
+                  onTap: onAuthButtonPressed,
+                  child: iconWidget,
                 )
               : ElevatedButton.icon(
                   icon: iconWidget,
-                  style: authButtonStyle,
                   onPressed: onAuthButtonPressed,
-                  label:
-                      Text('Continue with ${socialProvider.capitalizedName}'),
+                  label: Text(
+                    'Continue with ${socialProvider.capitalizedName}',
+                    style: TextStyle(color: foregroundColor),
+                  ),
+                  style: authButtonStyle,
                 ),
         );
       },
