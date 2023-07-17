@@ -146,13 +146,16 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               try {
                 if (isSigningIn) {
                   final response = await supabase.auth.signInWithPassword(
-                    phone: _phone.text,
+                    phone: '+'+maskFormatter.getUnmaskedText(),
                     password: _password.text,
                   );
                   widget.onSuccess(response);
                 } else {
                   final response = await supabase.auth
-                      .signUp(phone: _phone.text, password: _password.text);
+                      .signUp(
+                        phone: '+'+maskFormatter.getUnmaskedText(), 
+                        password: _password.text
+                      );
                   if (!mounted) return;
                   widget.onSuccess(response);
                 }
@@ -165,7 +168,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               } catch (error) {
                 if (widget.onError == null) {
                   context.showErrorSnackBar(
-                      'Unexpected error has occurred: $error');
+                     'Unexpected error has occurred: $error');
                 } else {
                   widget.onError?.call(error);
                 }
@@ -173,6 +176,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               setState(() {
                 _phone.text = '';
                 _password.text = '';
+                _confirmPass.text = '';
               });
             },
           ),
