@@ -282,15 +282,16 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
         ],
         if (isVerifying) ... [
           SupaVerifyPhone(
-            phoneVal: phoneNum,
+            phoneVal: '+' + maskFormatter.getUnmaskedText(),
             onSuccess: (ar) {
-              print("WORKED WORKED WORKED");
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Text("SUCCESS!"),
-                  )
+                  content: const Text("Successful Verification!"),
+                  backgroundColor: Colors.green,
+                ),
               );
-            }
+              Navigator.of(context).pushReplacementNamed('/');
+            },
           )
         ]
       ]),

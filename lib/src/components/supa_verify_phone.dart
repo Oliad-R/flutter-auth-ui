@@ -81,13 +81,12 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
               if (!_formKey.currentState!.validate()) {
                 return;
               }
-              ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text("PHONE: "+widget.phoneVal),
-                  )
-              );
+              // ScaffoldMessenger.of(context).showSnackBar(
+              //     SnackBar(
+              //       content: Text("PHONE: "+widget.phoneVal),
+              //     )
+              // );
               try {
-                
                 final response = await supabase.auth.verifyOTP(
                   phone: widget.phoneVal,
                   token: _code.text,
