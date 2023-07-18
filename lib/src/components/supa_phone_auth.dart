@@ -160,6 +160,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                         phone: '+'+maskFormatter.getUnmaskedText(), 
                         password: _password.text
                       );
+                  setState(()=> isVerifying=true);
                   if (!mounted) return;
                   widget.onSuccess(response);
                 }
