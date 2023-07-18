@@ -122,7 +122,11 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
                 // style: TextStyle(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
-                Navigator.pushNamed(context, '/');
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/phone_sign_in',
+                  ModalRoute.withName('/'),
+                );              
               },
             ),
         ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_auth_ui/supabase_auth_ui.dart';
 
 import 'constants.dart';
+import 'home.dart';
 
 class PhoneSignUp extends StatelessWidget {
   const PhoneSignUp({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class PhoneSignUp extends StatelessWidget {
               onSuccess: (response) {
                 // Navigator.of(context).pushReplacementNamed('/verify_phone');
               },
+              redirectWidget: Home(),
             ),
             // TextButton(
             //   child: const Text(

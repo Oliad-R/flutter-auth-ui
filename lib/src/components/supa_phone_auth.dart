@@ -9,6 +9,9 @@ class SupaPhoneAuth extends StatefulWidget {
   /// Whether the user is sining in or signin up
   final SupaAuthAction authAction;
 
+  //Home Page
+  final Widget redirectWidget;
+
   /// Method to be called when the auth action is success
   final void Function(AuthResponse response) onSuccess;
 
@@ -19,6 +22,7 @@ class SupaPhoneAuth extends StatefulWidget {
     Key? key,
     required this.authAction,
     required this.onSuccess,
+    required this.redirectWidget,
     this.onError,
   }) : super(key: key);
 
@@ -154,15 +158,35 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                     password: _password.text,
                   );
                   widget.onSuccess(response);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context)=> widget.redirectWidget)
+                  );
                 } else {
                   final response = await supabase.auth
                       .signUp(
                         phone: '+'+maskFormatter.getUnmaskedText(), 
                         password: _password.text
                       );
-                  setState(()=> isVerifying=true);
+                  // setState(()=> isVerifying=true);
                   if (!mounted) return;
-                  widget.onSuccess(response);
+                  // widget.onSuccess(response);
+                    if (response != null && response.user != null) {
+                      setState(() => isVerifying = true);
+                      widget.onSuccess(response);
+                    } else {
+                      // Handle the case when the phone number is already registered
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text("Phone number already registered."),
+                          backgroundColor: Theme.of(context).colorScheme.error,
+                        ),
+                      );
+                    }
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(builder: (context)=> widget.redirectWidget)
+                  // );
                 }
               } on AuthException catch (error) {
                 if (widget.onError == null) {
