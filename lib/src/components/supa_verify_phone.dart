@@ -5,6 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// UI component for verifying phone number
 class SupaVerifyPhone extends StatefulWidget {
+  //Phone Value
+  final String phoneVal;
+
   /// Method to be called when the auth action is success
   final void Function(AuthResponse response) onSuccess;
 
@@ -13,6 +16,7 @@ class SupaVerifyPhone extends StatefulWidget {
 
   const SupaVerifyPhone({
     Key? key,
+    required this.phoneVal,
     required this.onSuccess,
     this.onError,
   }) : super(key: key);
@@ -53,7 +57,7 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextFormField(
-            keyboardType: TextInputType.phone,
+            keyboardType: TextInputType.number,
             inputFormatters: [maskFormatter],
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -77,9 +81,15 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
               if (!_formKey.currentState!.validate()) {
                 return;
               }
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text("PHONE: "+widget.phoneVal),
+                  )
+              );
               try {
+                
                 final response = await supabase.auth.verifyOTP(
-                  phone: data!["phone"],
+                  phone: widget.phoneVal,
                   token: _code.text,
                   type: OtpType.sms,
                 );

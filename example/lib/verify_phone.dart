@@ -14,11 +14,11 @@ class VerifyPhone extends StatelessWidget {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            SupaVerifyPhone(
-              onSuccess: (response) {
-                Navigator.of(context).pushReplacementNamed('/home');
-              },
-            ),
+            // SupaVerifyPhone(
+            //   onSuccess: (response) {
+            //     Navigator.of(context).pushReplacementNamed('/home');
+            //   },
+            // ),
             // TextButton(
             //   child: const Text(
             //     'Forgot Password? Click here',

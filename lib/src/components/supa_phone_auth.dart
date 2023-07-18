@@ -32,6 +32,9 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
   final _password = TextEditingController();
   final _confirmPass = TextEditingController();
 
+  bool isVerifying = false;
+  var phoneNum = '';
+
   bool _forgotPassword = false;
   var isSigningIn = true;
 
@@ -61,6 +64,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+        if (!(isVerifying)) ...[
         if (!(_forgotPassword)) ...[
             TextFormField(
               keyboardType: TextInputType.phone,
@@ -175,6 +179,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               }
               setState(() {
                 _phone.text = '';
+                phoneNum = '';
                 _password.text = '';
                 _confirmPass.text = '';
               });
@@ -250,7 +255,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                   if (!_formKey.currentState!.validate()) {
                     return;
                   }
-                  final phoneNum = _phone.text.trim();
+                  phoneNum = '+'+maskFormatter.getUnmaskedText();
                   // await supabase.auth.resetPasswordForEmail(email);
                   // widget.onPasswordResetEmailSent?.call();
                 } on AuthException catch (error) {
@@ -274,7 +279,20 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
             ),
           ],
         ],
-      ),
+        if (isVerifying) ... [
+          SupaVerifyPhone(
+            phoneVal: phoneNum,
+            onSuccess: (ar) {
+              print("WORKED WORKED WORKED");
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text("SUCCESS!"),
+                  )
+              );
+            }
+          )
+        ]
+      ]),
     );
   }
 }
