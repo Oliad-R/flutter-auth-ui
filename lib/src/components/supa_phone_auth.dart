@@ -176,21 +176,10 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                         phone: '+'+maskFormatter.getUnmaskedText(), 
                         password: _password.text
                       );
-                  // setState(()=> isVerifying=true);
+                  setState(()=> isVerifying=true);
                   if (!mounted) return;
                   // widget.onSuccess(response);
-                    if (response != null && response.user != null) {
-                      setState(() => isVerifying = true);
-                      widget.onSuccess(response);
-                    } else {
-                      // Handle the case when the phone number is already registered
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text("Phone number already registered."),
-                          backgroundColor: Theme.of(context).colorScheme.error,
-                        ),
-                      );
-                    }
+                    
                   // Navigator.push(
                   //     context,
                   //     MaterialPageRoute(builder: (context)=> widget.redirectWidget)
@@ -288,7 +277,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                   if (!_formKey.currentState!.validate()) {
                     return;
                   }
-                  phoneNum = '+'+maskFormatter.getUnmaskedText();
+                  // phoneNum = '+'+maskFormatter.getUnmaskedText();
                   // await supabase.auth.resetPasswordForEmail(email);
                   // widget.onPasswordResetEmailSent?.call();
                 } on AuthException catch (error) {
@@ -378,6 +367,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                     onPressed: () {
                       setState(() {
                         isSigningIn = false;
+                        isVerifying = false;
                         //Navigator
                       });      
                     },
