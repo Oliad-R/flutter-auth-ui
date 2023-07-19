@@ -165,7 +165,6 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                           phone: '+'+maskFormatter.getUnmaskedText(), 
                           password: _password.text
                         );
-                    phoneNum = '+'+maskFormatter.getUnmaskedText();
                     if (!mounted) return;
                     // widget.onSuccess(response);
                     setState(() {
@@ -325,7 +324,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                     }
                     try {
                       final response = await supabase.auth.verifyOTP(
-                        phone: phoneNum,
+                        phone: '+'+maskFormatter.getUnmaskedText(),
                         token: _code.text,
                         type: OtpType.sms,
                       );
