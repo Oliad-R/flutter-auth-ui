@@ -35,6 +35,8 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
   final _phone = TextEditingController();
   final _password = TextEditingController();
   final _confirmPass = TextEditingController();
+  
+  final _code = TextEditingController();
 
   bool isVerifying = false;
   var phoneNum = '';
@@ -47,6 +49,12 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
     filter: { "#": RegExp(r'[0-9]') },
     type: MaskAutoCompletionType.lazy
   );
+
+  var maskFormatter2 = new MaskTextInputFormatter(
+            mask: '######',
+            filter: { "#": RegExp(r'[0-9]') },
+            type: MaskAutoCompletionType.eager
+          );
 
   @override
   void initState() {
@@ -305,17 +313,77 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
           ],
         ],
         if (isVerifying) ... [
-          SupaVerifyPhone(
-            phoneVal: '+' + maskFormatter.getUnmaskedText(),
-            onSuccess: (ar) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text("Successful Verification!"),
-                  backgroundColor: Colors.green,
+          Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [maskFormatter2],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the one time code sent';
+                    }
+                    return null;  
+                  },
+                  decoration: const InputDecoration(
+                    label: Text('Verification Code'),
+                  ),
+                  controller: _code,
                 ),
-              );
-              Navigator.of(context).pushReplacementNamed('/');
-            },
+                spacer(16),
+                ElevatedButton(
+                  child: const Text(
+                    'Verify Phone',
+                  ),
+                  onPressed: () async {
+                    if (!_formKey.currentState!.validate()) {
+                      return;
+                    }
+                    try {
+                      final response = await supabase.auth.verifyOTP(
+                        phone: phoneNum,
+                        token: _code.text,
+                        type: OtpType.sms,
+                      );
+                      widget.onSuccess(response);
+                    } on AuthException catch (error) {
+                      if (widget.onError == null) {
+                        context.showErrorSnackBar(error.message);
+                      } else {
+                        widget.onError?.call(error);
+                      }
+                    } catch (error) {
+                      if (widget.onError == null) {
+                        context.showErrorSnackBar(
+                            'Unexpected error has occurred: $error');
+                      } else {
+                        widget.onError?.call(error);
+                      }
+                    }
+                    if (mounted) {
+                      setState(() {
+                        _code.text = '';
+                      });
+                    }
+                  },
+                ),
+                spacer(10),
+
+                TextButton(
+                    child: const Text(
+                      'Take me back to Sign up',
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        isSigningIn = false;
+                        //Navigator
+                      });      
+                    },
+                  ),
+              ],
+            ),
           )
         ]
       ]),

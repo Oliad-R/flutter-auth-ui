@@ -15,13 +15,12 @@ class PhoneSignUp extends StatelessWidget {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            SupaPhoneAuth(
-              authAction: SupaAuthAction.signUp,
-              onSuccess: (response) {
-                // Navigator.of(context).pushReplacementNamed('/verify_phone');
-              },
-              redirectWidget: Home(),
-            ),
+            // SupaPhoneAuth(
+            //   authAction: SupaAuthAction.signUp,
+            //   onSuccess: (response) {
+            //     // Navigator.of(context).pushReplacementNamed('/verify_phone');
+            //   },
+            // ),
             // TextButton(
             //   child: const Text(
             //     'Already have an account? Sign In',

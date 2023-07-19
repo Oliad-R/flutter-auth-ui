@@ -15,12 +15,11 @@ class PhoneSignIn extends StatelessWidget {
         padding: const EdgeInsets.all(24.0),
         child: Column(
           children: [
-            SupaPhoneAuth(
-              authAction: SupaAuthAction.signIn,
-              onSuccess: (response) {
-              },
-              redirectWidget: Home(),
-            ),
+            // SupaPhoneAuth(
+            //   authAction: SupaAuthAction.signIn,
+            //   onSuccess: (response) {
+            //   },
+            // ),
             // TextButton(
             //   child: const Text(
             //     'Don\'t have an account? Sign Up',

@@ -30,7 +30,7 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
   final _formKey = GlobalKey<FormState>();
   final _code = TextEditingController();
 
-  var maskFormatter = new MaskTextInputFormatter(
+  var maskFormatter2 = new MaskTextInputFormatter(
     mask: '######',
     filter: { "#": RegExp(r'[0-9]') },
     type: MaskAutoCompletionType.eager
@@ -49,8 +49,6 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
 
   @override
   Widget build(BuildContext context) {
-    var args = ModalRoute.of(context)?.settings.arguments;
-    if (args != null) data = args as Map;
     return Form(
       key: _formKey,
       child: Column(
@@ -58,7 +56,7 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
         children: [
           TextFormField(
             keyboardType: TextInputType.number,
-            inputFormatters: [maskFormatter],
+            inputFormatters: [maskFormatter2],
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Please enter the one time code sent';
@@ -66,7 +64,6 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
               return null;  
             },
             decoration: const InputDecoration(
-              // prefixIcon: Icon(Icons.pin),
               label: Text('Verification Code'),
             ),
             controller: _code,
@@ -75,17 +72,11 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
           ElevatedButton(
             child: const Text(
               'Verify Phone',
-              // style: TextStyle(fontWeight: FontWeight.bold),
             ),
             onPressed: () async {
               if (!_formKey.currentState!.validate()) {
                 return;
               }
-              // ScaffoldMessenger.of(context).showSnackBar(
-              //     SnackBar(
-              //       content: Text("PHONE: "+widget.phoneVal),
-              //     )
-              // );
               try {
                 final response = await supabase.auth.verifyOTP(
                   phone: widget.phoneVal,
@@ -119,14 +110,12 @@ class _SupaVerifyPhoneState extends State<SupaVerifyPhone> {
           TextButton(
               child: const Text(
                 'Take me back to Sign up',
-                // style: TextStyle(fontWeight: FontWeight.bold),
               ),
               onPressed: () {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/phone_sign_in',
-                  ModalRoute.withName('/'),
-                );              
+                setState(() {
+                  // isSigningIn = false;
+                  //Navigator
+                });      
               },
             ),
         ],
