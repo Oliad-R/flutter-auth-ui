@@ -77,7 +77,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
         if (!(isVerifying)) ...[
-        if (!(_forgotPassword)) ...[
+          if (!(_forgotPassword)) ...[
             TextFormField(
               keyboardType: TextInputType.phone,
               inputFormatters: [maskFormatter],
@@ -149,64 +149,64 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               ),
             ],
           
-          spacer(16),
+            spacer(16),
 
-          ElevatedButton(
-            child: Text(
-              isSigningIn ? 'Sign In' : 'Sign Up',
+            ElevatedButton(
+              child: Text(
+                isSigningIn ? 'Sign In' : 'Sign Up',
+              ),
+              onPressed: () async {
+                if (!_formKey.currentState!.validate()) {
+                  return;
+                }
+                try {
+                  if (isSigningIn) {
+                    final response = await supabase.auth.signInWithPassword(
+                      phone: '+'+maskFormatter.getUnmaskedText(),
+                      password: _password.text,
+                    );
+                    widget.onSuccess(response);
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context)=> widget.redirectWidget)
+                    );
+                  } else {
+                    final response = await supabase.auth.signUp(
+                          phone: '+'+maskFormatter.getUnmaskedText(), 
+                          password: _password.text
+                        );
+                    if (!mounted) return;
+                    widget.onSuccess(response);
+                    setState(() {
+                      isVerifying = true;
+                    });
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(builder: (context)=> widget.redirectWidget)
+                    // );
+                  }
+                } on AuthException catch (error) {
+                  if (widget.onError == null) {
+                    context.showErrorSnackBar(error.message);
+                  } else {
+                    widget.onError?.call(error);
+                  }
+                } catch (error) {
+                  if (widget.onError == null) {
+                    context.showErrorSnackBar(
+                      'Unexpected error has occurred: $error');
+                  } else {
+                    widget.onError?.call(error);
+                  }
+                }
+                setState(() {
+                  _phone.text = '';
+                  phoneNum = '';
+                  _password.text = '';
+                  _confirmPass.text = '';
+                });
+              },
             ),
-            onPressed: () async {
-              if (!_formKey.currentState!.validate()) {
-                return;
-              }
-              try {
-                if (isSigningIn) {
-                  final response = await supabase.auth.signInWithPassword(
-                    phone: '+'+maskFormatter.getUnmaskedText(),
-                    password: _password.text,
-                  );
-                  widget.onSuccess(response);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context)=> widget.redirectWidget)
-                  );
-                } else {
-                  final response = await supabase.auth
-                      .signUp(
-                        phone: '+'+maskFormatter.getUnmaskedText(), 
-                        password: _password.text
-                      );
-                  setState(()=> isVerifying=true);
-                  if (!mounted) return;
-                  // widget.onSuccess(response);
-                    
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(builder: (context)=> widget.redirectWidget)
-                  // );
-                }
-              } on AuthException catch (error) {
-                if (widget.onError == null) {
-                  context.showErrorSnackBar(error.message);
-                } else {
-                  widget.onError?.call(error);
-                }
-              } catch (error) {
-                if (widget.onError == null) {
-                  context.showErrorSnackBar(
-                     'Unexpected error has occurred: $error');
-                } else {
-                  widget.onError?.call(error);
-                }
-              }
-              setState(() {
-                _phone.text = '';
-                phoneNum = '';
-                _password.text = '';
-                _confirmPass.text = '';
-              });
-            },
-          ),
 
           spacer(16),
 
@@ -245,8 +245,8 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                   });
                 },
               ),
-            ],
           ],
+        ],
 
           spacer(16),
 
@@ -301,6 +301,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
             ),
           ],
         ],
+
         if (isVerifying) ... [
           Form(
             key: _formKey,
