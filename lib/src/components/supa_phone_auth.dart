@@ -6,11 +6,6 @@ import 'package:wc_form_validators/wc_form_validators.dart';
 
 /// UI component to create a phone + password signin/ signup form
 class SupaPhoneAuth extends StatefulWidget {
-  /// Whether the user is sining in or signin up
-  final SupaAuthAction authAction;
-
-  //Home Page
-  final Widget redirectWidget;
 
   /// Method to be called when the auth action is success
   final void Function(AuthResponse response) onSuccess;
@@ -20,9 +15,7 @@ class SupaPhoneAuth extends StatefulWidget {
 
   const SupaPhoneAuth({
     Key? key,
-    required this.authAction,
     required this.onSuccess,
-    required this.redirectWidget,
     this.onError,
   }) : super(key: key);
 
@@ -35,7 +28,8 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
   final _phone = TextEditingController();
   final _password = TextEditingController();
   final _confirmPass = TextEditingController();
-  
+
+  final _formKey2 = GlobalKey<FormState>();  
   final _code = TextEditingController();
 
   bool isVerifying = false;
@@ -166,10 +160,6 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                       password: _password.text,
                     );
                     widget.onSuccess(response);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context)=> widget.redirectWidget)
-                    );
                   } else {
                     final response = await supabase.auth.signUp(
                           phone: '+'+maskFormatter.getUnmaskedText(), 
@@ -177,18 +167,14 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                         );
                     if (!mounted) return;
                     // widget.onSuccess(response);
-                    // setState(() {
-                    //   isVerifying = true;
-                    // });
+                    setState(() {
+                      isVerifying = true;
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: const Text("Check text for SMS verification."),
                       )
                     );
-                    // Navigator.push(
-                    //     context,
-                    //     MaterialPageRoute(builder: (context)=> widget.redirectWidget)
-                    // );
                   }
                 } on AuthException catch (error) {
                   if (widget.onError == null) {
@@ -205,7 +191,6 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                   }
                 }
                 setState(() {
-                  isVerifying = true;
                   _phone.text = '';
                   phoneNum = '';
                   _password.text = '';
