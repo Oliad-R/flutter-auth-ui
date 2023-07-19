@@ -165,6 +165,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                           phone: '+'+maskFormatter.getUnmaskedText(), 
                           password: _password.text
                         );
+                    phoneNum = '+'+maskFormatter.getUnmaskedText();
                     if (!mounted) return;
                     // widget.onSuccess(response);
                     setState(() {
@@ -295,7 +296,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
 
         if (isVerifying) ... [
           Form(
-            key: _formKey,
+            key: _formKey2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -319,7 +320,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                     'Verify Phone',
                   ),
                   onPressed: () async {
-                    if (!_formKey.currentState!.validate()) {
+                    if (!_formKey2.currentState!.validate()) {
                       return;
                     }
                     try {
