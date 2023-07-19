@@ -176,10 +176,15 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                           password: _password.text
                         );
                     if (!mounted) return;
-                    widget.onSuccess(response);
-                    setState(() {
-                      isVerifying = true;
-                    });
+                    // widget.onSuccess(response);
+                    // setState(() {
+                    //   isVerifying = true;
+                    // });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text("Check text for SMS verification."),
+                      )
+                    );
                     // Navigator.push(
                     //     context,
                     //     MaterialPageRoute(builder: (context)=> widget.redirectWidget)
@@ -200,6 +205,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                   }
                 }
                 setState(() {
+                  isVerifying = true;
                   _phone.text = '';
                   phoneNum = '';
                   _password.text = '';
