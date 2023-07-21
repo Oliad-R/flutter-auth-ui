@@ -17,6 +17,7 @@ class PhoneSignUp extends StatelessWidget {
           children: [
             SupaPhoneAuth(
               onSuccess: (response) {
+                Navigator.of(context).pushNamed('/home');
               },
             ),
             // TextButton(
