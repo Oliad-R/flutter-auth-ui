@@ -32,11 +32,14 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
   final _formKey2 = GlobalKey<FormState>();  
   final _code = TextEditingController();
 
+  final _formKey3 = GlobalKey<FormState>();
+
   bool isVerifying = false;
   var phoneNum = '';
 
   bool _forgotPassword = false;
-  var isSigningIn = true;
+  bool isSigningIn = true;
+  bool updatePassword = false;
 
   var maskFormatter = new MaskTextInputFormatter(
     mask: '+# (###) ###-####', 
@@ -70,7 +73,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-        if (!(isVerifying)) ...[
+        if (!(isVerifying) && !(updatePassword)) ...[
           if (!(_forgotPassword)) ...[
             TextFormField(
               keyboardType: TextInputType.phone,
@@ -201,7 +204,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
 
           spacer(16),
 
-          if (isSigningIn)... [
+          if (isSigningIn && !(updatePassword))... [
             TextButton(
               onPressed: () {
                 setState(() {
@@ -224,6 +227,8 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
             ),
           ],
 
+          ],
+
           if (!(isSigningIn)) ... [
             TextButton(
                 child: const Text(
@@ -239,58 +244,69 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
           ],
         ],
 
+        spacer(16),
+
+        if (_forgotPassword) ...[
+          TextFormField(
+            keyboardType: TextInputType.phone,
+            inputFormatters: [maskFormatter],
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Phone number is required';
+              } else if (!RegExp(r'^\+1 \(\d{3}\) \d{3}-\d{4}$').hasMatch(value)) {
+                return 'Invalid phone number';
+              }
+              return null;
+            },
+            decoration: const InputDecoration(
+              // prefixIcon: Icon(Icons.phone),
+              label: Text('Phone Number'),
+            ),
+            controller: _phone,
+          ),
+
           spacer(16),
 
-          if (_forgotPassword) ...[
-            TextFormField(
-              keyboardType: TextInputType.phone,
-              inputFormatters: [maskFormatter],
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Phone number is required';
-                } else if (!RegExp(r'^\+1 \(\d{3}\) \d{3}-\d{4}$').hasMatch(value)) {
-                  return 'Invalid phone number';
-                }
-                return null;
-              },
-              decoration: const InputDecoration(
-                // prefixIcon: Icon(Icons.phone),
-                label: Text('Phone Number'),
-              ),
-              controller: _phone,
-            ),
-
-            spacer(16),
-
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  if (!_formKey.currentState!.validate()) {
-                    return;
-                  }
-                  // phoneNum = '+'+maskFormatter.getUnmaskedText();
-                  // await supabase.auth.resetPasswordForEmail(email);
-                  // widget.onPasswordResetEmailSent?.call();
-                } on AuthException catch (error) {
-                  widget.onError?.call(error);
-                } catch (error) {
-                  widget.onError?.call(error);
-                }
-              },
-              child: const Text('Send password reset via SMS'),
-            ),
-
-            spacer(16),
-
-            TextButton(
-              onPressed: () {
+          ElevatedButton(
+            onPressed: () async {
+              if (!_formKey.currentState!.validate()) {
+                return;
+              }
+              try {
+                final response = await supabase.auth.signInWithOtp(
+                  phone: '+'+maskFormatter.getUnmaskedText(),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text("Check text for SMS One-Time-Password (OTP)."),
+                  )
+                );
                 setState(() {
+                  isVerifying = true;
                   _forgotPassword = false;
                 });
-              },
-              child: const Text('Back to Sign in'),
-            ),
-          ],
+                // phoneNum = '+'+maskFormatter.getUnmaskedText();
+                // await supabase.auth.resetPasswordForEmail(email);
+                // widget.onPasswordResetEmailSent?.call();
+              } on AuthException catch (error) {
+                widget.onError?.call(error);
+              } catch (error) {
+                widget.onError?.call(error);
+              }
+            },
+            child: const Text('Send password reset via SMS'),
+          ),
+
+          spacer(16),
+
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _forgotPassword = false;
+              });
+            },
+            child: const Text('Back to Sign in'),
+          ),
         ],
 
         if (isVerifying) ... [
@@ -306,7 +322,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter the one time code sent';
                     }
-                    return null;  
+                    return null;
                   },
                   decoration: const InputDecoration(
                     label: Text('Verification Code'),
@@ -328,7 +344,11 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                         token: _code.text,
                         type: OtpType.sms,
                       );
-                      widget.onSuccess(response);
+                      setState((){
+                        updatePassword = true;
+                        isVerifying = false;
+                      });
+                      // widget.onSuccess(response);
                     } on AuthException catch (error) {
                       if (widget.onError == null) {
                         context.showErrorSnackBar(error.message);
@@ -364,11 +384,105 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                       });      
                     },
                   ),
-              ],
+              ],  
             ),
           )
+        ],
+
+
+        if (updatePassword) ... [
+        Form(
+            key: _formKey3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  validator:Validators.compose([
+                      Validators.required('Password is required'),
+                      Validators.patternString(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$', 'Password must have:\n\t•\t1 Uppercase\n\t•\t1 Lowercase\n\t•\t1 Number\n\t•\t8 Characters Long')]),
+                  decoration: const InputDecoration(
+                    // prefixIcon: Icon(Icons.key_rounded),
+                    label: Text('New Password'),
+                  ),
+                  obscureText: true,
+                  controller: _password,
+                ),
+
+                spacer(16),
+
+                TextFormField(
+                  validator: (value) {
+                    if (value==null || value.isEmpty){
+                      return "Confirm password required";
+                    }
+                    else if (value!=_password.text){
+                      return "Passwords do not match";
+                    }  
+                    else {
+                      return null;
+                    }            
+                  },
+                  decoration: const InputDecoration(
+                    label: Text('Confirm New Password'),
+                  ),
+                  obscureText: true,
+                  controller: _confirmPass,
+                ),
+                spacer(16),
+
+                ElevatedButton(
+                  child: const Text(
+                    'Update Password',
+                  ),
+                  onPressed: () async {
+                    if (!_formKey3.currentState!.validate()) {
+                      return;
+                    }
+                    try {
+                      final response = await supabase.auth.updateUser(
+                        UserAttributes(
+                          // phone: '+'+maskFormatter.getUnmaskedText(),
+                          password: _password.text,
+                        )
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text("Password Reset!"),
+                          backgroundColor: Colors.green,
+                        )
+                      );
+                      setState(() {
+                        isVerifying = false;
+                        updatePassword = false;
+                        isSigningIn = true;
+                      });
+                    } on AuthException catch (error) {
+                      if (widget.onError == null) {
+                        context.showErrorSnackBar(error.message);
+                      } else {
+                        widget.onError?.call(error);
+                      }
+                    } catch (error) {
+                      if (widget.onError == null) {
+                        context.showErrorSnackBar(
+                            'Unexpected error has occurred: $error');
+                      } else {
+                        widget.onError?.call(error);
+                      }
+                    }
+                    if (mounted) {
+                      setState(() {
+                        _phone.text = '';
+                        _confirmPass.text = '';
+                        _password.text = '';
+                      });
+                    }
+                  },
+                ),
+              ])
+            )
         ]
-      ]),
+      ])
     );
   }
 }
