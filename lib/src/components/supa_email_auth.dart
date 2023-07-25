@@ -1,7 +1,9 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:supabase_auth_ui/src/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'globals.dart' as globals;
 import 'package:wc_form_validators/wc_form_validators.dart';
 
 /// Information about the metadata to pass to the signup form
@@ -96,17 +98,32 @@ class SupaEmailAuth extends StatefulWidget {
 
 class _SupaEmailAuthState extends State<SupaEmailAuth> {
   final _formKey = GlobalKey<FormState>();
+  final _formKey2 = GlobalKey<FormState>();
+  final _formKey3 = GlobalKey<FormState>();
+  final _formKey4 = GlobalKey<FormState>();
+
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPassController = TextEditingController();
+  final _codeController = TextEditingController();
   late final Map<MetaDataField, TextEditingController> _metadataControllers;
 
   bool _isLoading = false;
+
+  
+
+  bool isVerifying = false;
 
   /// The user has pressed forgot password button
   bool _forgotPassword = false;
 
   bool _isSigningIn = true;
+
+  var maskFormatter = new MaskTextInputFormatter(
+    mask: '######',
+    filter: { "#": RegExp(r'[0-9]') },
+    type: MaskAutoCompletionType.eager
+  );
 
   @override
   void initState() {
@@ -119,6 +136,8 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPassController.dispose();
+    _codeController.dispose();
     for (final controller in _metadataControllers.values) {
       controller.dispose();
     }
@@ -132,6 +151,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+        if (!(isVerifying) && !(globals.updatePassword)) ... [
           TextFormField(
             keyboardType: TextInputType.emailAddress,
             autofillHints: const [AutofillHints.email],
@@ -146,88 +166,71 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
               }
             },
             decoration: const InputDecoration(
-              // prefixIcon: Icon(Icons.email),
               label: Text('Email'),
             ),
             controller: _emailController,
           ),
+
           if (!_forgotPassword) ...[
             spacer(16),
             if (!_isSigningIn) ...[
-            TextFormField(
-              validator:Validators.compose([
-                  Validators.required('Password is required'),
-                  Validators.patternString(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$', 'Password must have:\n\t•\t1 Uppercase\n\t•\t1 Lowercase\n\t•\t1 Number\n\t•\t8 Characters Long')]),
-              //  (value) {
-                
-              //   ]);
-                // if (value == null || value.isEmpty || value.length < 6) {
-                //   return 'Password must be at least 6 characters long';
-                // }
-                // return null;
-              // },
-              decoration: const InputDecoration(
-                // prefixIcon: Icon(Icons.key_rounded),
-                label: Text('Password'),
+              TextFormField(
+                validator:Validators.compose([
+                    Validators.required('Password is required'),
+                    Validators.patternString(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$', 'Password must have:\n\t•\t1 Uppercase\n\t•\t1 Lowercase\n\t•\t1 Number\n\t•\t8 Characters Long')]),
+                decoration: const InputDecoration(
+                  // prefixIcon: Icon(Icons.key_rounded),
+                  label: Text('Password'),
+                ),
+                obscureText: true,
+                controller: _passwordController,
               ),
-              obscureText: true,
-              controller: _passwordController,
-            ),
-            spacer(16),
-            TextFormField(
-              validator: (value) {
-                if (value==null || value.isEmpty){
-                  return "Confirm password required.";
-                }
-                else if (value!=_passwordController.text){
-                  return "Passwords do not match.";
-                }  
-                else {
-                  return null;
-                }            
-              },
-              decoration: const InputDecoration(
-                // prefixIcon: Icon(Icons.key_rounded),
-                label: Text('Confirm Password'),
+
+              spacer(16),
+              
+              TextFormField(
+                validator: (value) {
+                  if (value==null || value.isEmpty){
+                    return "Confirm password required.";
+                  }
+                  else if (value!=_passwordController.text){
+                    return "Passwords do not match.";
+                  }  
+                  else {
+                    return null;
+                  }            
+                },
+                decoration: const InputDecoration(
+                  // prefixIcon: Icon(Icons.key_rounded),
+                  label: Text('Confirm Password'),
+                ),
+                obscureText: true,
+                controller: _confirmPassController,
               ),
-              obscureText: true,
-              controller: _confirmPassController,
-            ),
             ],
+
             if(_isSigningIn) ... [
               TextFormField(
-              validator: 
-              (value) {
-                if (value==null || value.isEmpty){
-                  return "Password required.";
-                }
-                else {
-                  return null;
-                }
-              },
-              decoration: const InputDecoration(
-                // prefixIcon: Icon(Icons.key_rounded),
-                label: Text('Password'),
-              ),
-              obscureText: true,
-              controller: _passwordController,
-            )
+                validator: 
+                (value) {
+                  if (value==null || value.isEmpty){
+                    return "Password required.";
+                  }
+                  else {
+                    return null;
+                  }
+                },
+                decoration: const InputDecoration(
+                  // prefixIcon: Icon(Icons.key_rounded),
+                  label: Text('Password'),
+                ),
+                obscureText: true,
+                controller: _passwordController,
+              )
             ],
+
             spacer(16),
-            if (widget.metadataFields != null && !_isSigningIn)
-              ...widget.metadataFields!
-                  .map((metadataField) => [
-                        TextFormField(
-                          controller: _metadataControllers[metadataField],
-                          decoration: InputDecoration(
-                            label: Text(metadataField.label),
-                            prefixIcon: metadataField.prefixIcon,
-                          ),
-                          validator: metadataField.validator,
-                        ),
-                        spacer(16),
-                      ])
-                  .expand((element) => element),
+
             ElevatedButton(
               child: (_isLoading)
                   ? SizedBox(
@@ -244,7 +247,7 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                   return;
                 }
                 setState(() {
-                  _isLoading = true;
+                  // _isLoading = true;
                 });
                 try {
                   if (_isSigningIn) {
@@ -258,11 +261,17 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                       email: _emailController.text.trim(),
                       password: _passwordController.text.trim(),
                       emailRedirectTo: widget.redirectTo,
-                      data: widget.metadataFields == null
-                          ? null
-                          : _metadataControllers.map<String, dynamic>(
-                              (metaDataField, controller) =>
-                                  MapEntry(metaDataField.key, controller.text)),
+                      data: {
+                        "first_name": "", // Empty string as default value for firstName
+                        "last_name": "", // Empty string as default value for lastName
+                        // "userType": null, // Null as default value for userType
+                        // "cardConnected": false, // False as default value for cardConnected
+                      },
+                      // data: widget.metadataFields == null
+                      //     ? null
+                      //     : _metadataControllers.map<String, dynamic>(
+                      //         (metaDataField, controller) =>
+                      //             MapEntry(metaDataField.key, controller.text)),
                     );
                     widget.onSignUpComplete.call(response);
                   }
@@ -287,21 +296,26 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                 }
               },
             ),
+
             spacer(16),
+
             if (_isSigningIn) ...[
               TextButton(
                 onPressed: () {
                   setState(() {
+                    _isLoading = false;
                     _forgotPassword = true;
                   });
                 },
                 child: const Text('Forgot your password?'),
               ),
             ],
+
             TextButton(
               key: const ValueKey('toggleSignInButton'),
               onPressed: () {
                 setState(() {
+                  _isLoading = false;
                   _forgotPassword = false;
                   _isSigningIn = !_isSigningIn;
                 });
@@ -311,7 +325,8 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                   : 'Already have an account? Sign in'),
             ),
           ],
-          if (_isSigningIn && _forgotPassword) ...[
+
+          if (_forgotPassword) ...[
             spacer(16),
             ElevatedButton(
               onPressed: () async {
@@ -322,31 +337,218 @@ class _SupaEmailAuthState extends State<SupaEmailAuth> {
                   setState(() {
                     _isLoading = true;
                   });
-
-                  final email = _emailController.text.trim();
-                  await supabase.auth.resetPasswordForEmail(email);
-                  widget.onPasswordResetEmailSent?.call();
-                } on AuthException catch (error) {
-                  widget.onError?.call(error);
-                } catch (error) {
-                  widget.onError?.call(error);
-                }
+                  // await supabase.auth.resetPasswordForEmail(email);
+                    await supabase.auth.signInWithOtp(
+                      email: _emailController.text.trim(),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text("Check text for SMS One-Time-Password (OTP)."),
+                      )
+                    );
+                    setState(() {
+                      isVerifying = true;
+                      globals.updatePassword = false;
+                      _forgotPassword = false;
+                    });
+                    // widget.onPasswordResetEmailSent?.call();
+                  } on AuthException catch (error) {
+                    widget.onError?.call(error);
+                  } catch (error) {
+                    widget.onError?.call(error);
+                  }
               },
               child: const Text('Send password reset email'),
             ),
+
             spacer(16),
+
             TextButton(
               onPressed: () {
                 setState(() {
+                  _isSigningIn = true;
+                  _isLoading = false;
                   _forgotPassword = false;
                 });
               },
               child: const Text('Back to Sign in'),
             ),
           ],
-          spacer(16),
         ],
-      ),
+
+        if (isVerifying) ... [
+          Form(
+            key: _formKey2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [maskFormatter],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the one time code sent';
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    label: Text('Verification Code'),
+                  ),
+                  controller: _codeController,
+                ),
+                spacer(16),
+                ElevatedButton(
+                  child: const Text(
+                    'Verify OTP',
+                  ),
+                  onPressed: () async {
+                    if (!_formKey2.currentState!.validate()) {
+                      return;
+                    }
+                    try {
+                      final response = await supabase.auth.verifyOTP(
+                        email: _emailController.text,
+                        token: _codeController.text,
+                        type: OtpType.email,
+                      );
+                      setState((){
+                        globals.updatePassword = true;
+                        isVerifying = false;
+                      });
+                      // widget.onSuccess(response);
+                    } on AuthException catch (error) {
+                      if (widget.onError == null) {
+                        context.showErrorSnackBar(error.message);
+                      } else {
+                        widget.onError?.call(error);
+                      }
+                    } catch (error) {
+                      if (widget.onError == null) {
+                        context.showErrorSnackBar(
+                            'Unexpected error has occurred: $error');
+                      } else {
+                        widget.onError?.call(error);
+                      }
+                    }
+                    if (mounted) {
+                      setState(() {
+                        _codeController.text = '';
+                      });
+                    }
+                  },
+                ),
+                spacer(10),
+
+                TextButton(
+                    child: const Text(
+                      'Take me back to Sign in',
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _isSigningIn = true;
+                        _isLoading = false;
+                        isVerifying = false;
+                        //Navigator
+                      });      
+                    },
+                  ),
+              ]),
+          )
+        ],
+
+        if (globals.updatePassword) ... [
+          Form(
+            key: _formKey3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  validator:Validators.compose([
+                      Validators.required('Password is required'),
+                      Validators.patternString(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$', 'Password must have:\n\t•\t1 Uppercase\n\t•\t1 Lowercase\n\t•\t1 Number\n\t•\t8 Characters Long')]),
+                  decoration: const InputDecoration(
+                    // prefixIcon: Icon(Icons.key_rounded),
+                    label: Text('New Password'),
+                  ),
+                  obscureText: true,
+                  controller: _passwordController,
+                ),
+
+                spacer(16),
+
+                TextFormField(
+                  validator: (value) {
+                    if (value==null || value.isEmpty){
+                      return "Confirm password required";
+                    }
+                    else if (value!=_passwordController.text){
+                      return "Passwords do not match";
+                    }  
+                    else {
+                      return null;
+                    }            
+                  },
+                  decoration: const InputDecoration(
+                    label: Text('Confirm New Password'),
+                  ),
+                  obscureText: true,
+                  controller: _confirmPassController,
+                ),
+                spacer(16),
+
+                ElevatedButton(
+                  child: const Text(
+                    'Update Password',
+                  ),
+                  onPressed: () async {
+                    if (!_formKey3.currentState!.validate()) {
+                      return;
+                    }
+                    try {
+                      final response = await supabase.auth.updateUser(
+                        UserAttributes(
+                          email: _emailController.text,
+                          password: _passwordController.text,
+                        )
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text("Password Reset!"),
+                          backgroundColor: Colors.green,
+                        )
+                      );
+                      setState(() {
+                        globals.updatePassword = false;
+                        _isSigningIn = true;
+                      });
+                    } on AuthException catch (error) {
+                      if (widget.onError == null) {
+                        context.showErrorSnackBar(error.message);
+                      } else {
+                        widget.onError?.call(error);
+                      }
+                    } catch (error) {
+                      if (widget.onError == null) {
+                        context.showErrorSnackBar(
+                            'Unexpected error has occurred: $error');
+                      } else {
+                        widget.onError?.call(error);
+                      }
+                    }
+                    if (mounted) {
+                      setState(() {
+                        _isLoading = false;
+                        _emailController.text = '';
+                        _confirmPassController.text = '';
+                        _passwordController.text = '';
+                      });
+                    }
+                  },
+                ),
+              ])
+            )
+        ]
+      ]),
     );
   }
 }

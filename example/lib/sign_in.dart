@@ -20,7 +20,7 @@ class SignUp extends StatelessWidget {
               Navigator.of(context).pushReplacementNamed('/home');
             },
             onSignUpComplete: (response) {
-              Navigator.of(context).pushReplacementNamed('/home');
+              Navigator.of(context).pushReplacementNamed('/');
             },
           ),
           const Divider(),

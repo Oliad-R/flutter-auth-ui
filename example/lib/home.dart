@@ -14,9 +14,9 @@ class Home extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'You are home',
-              style: TextStyle(fontSize: 42),
+            Text(
+              'Welcome',
+              style: TextStyle(fontSize: 28),
             ),
             ElevatedButton(
               onPressed: () {

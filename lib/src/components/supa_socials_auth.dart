@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:supabase_auth_ui/src/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'globals.dart' as globals;
 
 /// Social provider that are supported
 enum SocialProviders {
@@ -146,7 +147,7 @@ class _SupaSocialsAuthState extends State<SupaSocialsAuth> {
     _gotrueSubscription =
         Supabase.instance.client.auth.onAuthStateChange.listen((data) {
       final session = data.session;
-      if (session != null && mounted) {
+      if ((session != null && mounted)&& (!globals.updatePassword)) {
         widget.onSuccess.call(session);
         if (widget.showSuccessSnackBar) {
           ScaffoldMessenger.of(context).showSnackBar(

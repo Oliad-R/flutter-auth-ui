@@ -166,7 +166,11 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                   } else {
                     final response = await supabase.auth.signUp(
                           phone: '+'+maskFormatter.getUnmaskedText(), 
-                          password: _password.text
+                          password: _password.text,
+                          data: {
+                            "first_name": "",
+                            "last_name": "",
+                          }
                         );
                     if (!mounted) return;
                     // widget.onSuccess(response);

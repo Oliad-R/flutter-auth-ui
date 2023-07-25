@@ -17,3 +17,5 @@ const optionText = Text(
 const spacer = SizedBox(
   height: 12,
 );
+
+bool updatePassword = false;

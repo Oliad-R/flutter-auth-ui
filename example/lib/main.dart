@@ -10,12 +10,12 @@ import 'phone_sign_in.dart';
 import './verify_phone.dart';
 import 'phone_sign_up.dart';
 
-void main() async {
+void main() async { 
   WidgetsFlutterBinding.ensureInitialized();
 
   /// TODO: replace with your credentials
   await Supabase.initialize(
-    url: 'https://yoursupabaseurl.supabase.co',
+     url: 'https://yoursupabaseurl.supabase.co',
     anonKey: 'your_anon_key',
   );
   runApp(DevicePreview(
@@ -24,6 +24,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+
   const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
