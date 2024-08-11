@@ -249,7 +249,6 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
         ],
 
         if (_forgotPassword) ...[
-          spacer(16),
           TextFormField(
             keyboardType: TextInputType.phone,
             inputFormatters: [maskFormatter],
