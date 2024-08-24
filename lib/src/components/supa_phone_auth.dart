@@ -352,6 +352,10 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                       setState((){
                         if (forgotWasPressed){
                           updatePassword = true;
+                        } else {
+                          if (mounted){
+                            widget.onSuccess(response);
+                          }
                         }
                         isVerifying = false;
                       });
