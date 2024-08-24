@@ -38,6 +38,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
   var phoneNum = '';
 
   bool _forgotPassword = false;
+  bool forgotWasPressed = false;
   bool isSigningIn = true;
   bool updatePassword = false;
 
@@ -196,7 +197,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                   } else {
                     widget.onError?.call(error);
                   }
-                }
+                } 
                 setState(() {
                   _phone.text = '';
                   phoneNum = '';
@@ -213,6 +214,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
               onPressed: () {
                 setState(() {
                   _forgotPassword = true;
+                  forgotWasPressed = true;
                 });
               },
               child: const Text('Forgot your password?'),
@@ -305,6 +307,7 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
             onPressed: () {
               setState(() {
                 _forgotPassword = false;
+                forgotWasPressed = false;
               });
             },
             child: const Text('Back to Sign in'),
@@ -347,7 +350,9 @@ class _SupaPhoneAuthState extends State<SupaPhoneAuth> {
                         type: OtpType.sms,
                       );
                       setState((){
-                        updatePassword = true;
+                        if (forgotWasPressed){
+                          updatePassword = true;
+                        }
                         isVerifying = false;
                       });
                       // widget.onSuccess(response);
